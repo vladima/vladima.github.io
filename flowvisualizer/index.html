@@ -22,6 +22,7 @@
         }
         </style>
         <script src="./scripts/viz.js"></script>
+        <script src="./scripts/svg-pan-zoom.min.js"></script>
     </head>
     <body>
         <div id="app">
@@ -56,6 +57,7 @@
                     if (graphContent) {
                         graph.removeChild(graphContent);
                     }
+
                     try {
                         var svg = Viz(text, { format: "svg", engine: "dot" });
                         if (svg) {
@@ -68,7 +70,13 @@
                         graphContent = error;
 
                     }
-                    graph.appendChild(graphContent);
+
+                    if (graphContent) {
+                        graph.appendChild(graphContent);
+                        if (graphContent instanceof SVGElement) {
+                            svgPanZoom(graphContent);
+                        }
+                    }
 
                 }, 1000);
             });
