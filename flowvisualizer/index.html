@@ -16,6 +16,10 @@
             width: 95%;
             height: 95%
         }
+        #error {
+            border: red;
+            border-style: solid;
+        }
         </style>
         <script src="./scripts/viz.js"></script>
     </head>
@@ -32,8 +36,16 @@
             var graph = document.getElementById("graph");
             var editor = ace.edit("editor");
             var session = editor.getSession();
-            var lastSvg;
+
+            var error = document.createElement("div");
+            error.setAttribute("id", "error");
+
+            var errorText = document.createTextNode("");
+            error.appendChild(errorText);
+
+            var graphContent;
             var throttled;
+
             session.setMode("ace/mode/dot");
             session.on("change", function() {
                 if (throttled) {
@@ -41,15 +53,23 @@
                 }
                 throttled = setTimeout(function () {
                     var text = session.getValue();
-                    var svg = Viz(text, { format: "svg", engine: "dot" });
-                    if (svg) {
-                        var result = domParser.parseFromString(svg, "image/svg+xml");
-                        if (lastSvg) {
-                            graph.removeChild(lastSvg);
-                        }
-                        lastSvg = result.documentElement;
-                        graph.appendChild(lastSvg);
+                    if (graphContent) {
+                        graph.removeChild(graphContent);
                     }
+                    try {
+                        var svg = Viz(text, { format: "svg", engine: "dot" });
+                        if (svg) {
+                            var result = domParser.parseFromString(svg, "image/svg+xml");
+                            graphContent = result.documentElement;
+                        }
+                    }
+                    catch(e) {
+                        errorText.nodeValue = typeof e === "string" ? e : e.message;
+                        graphContent = error;
+
+                    }
+                    graph.appendChild(graphContent);
+
                 }, 1000);
             });
         </script>
