@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <title>FlowVisualizer</title>
+        <style>
+        #panels {
+            display: flex;
+        }
+        #editor {
+            height: 100%;
+            width: 30%;
+        }
+        #graph {
+            flex-grow: 1;
+        }
+        svg {
+            width: 95%;
+            height: 95%
+        }
+        </style>
+        <script src="./scripts/viz.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <div id="panels">
+                <div id="editor">// paste the graph</div>
+                <div id="graph">   </div>
+            </div>
+        </div>
+        <script src="./scripts/ace.js"></script>
+        <script>
+            var domParser = new DOMParser();
+            var graph = document.getElementById("graph");
+            var editor = ace.edit("editor");
+            var session = editor.getSession();
+            var lastSvg;
+            var throttled;
+            session.setMode("ace/mode/dot");
+            session.on("change", function() {
+                if (throttled) {
+                    clearTimeout(throttled);
+                }
+                throttled = setTimeout(function () {
+                    var text = session.getValue();
+                    var svg = Viz(text, { format: "svg", engine: "dot" });
+                    if (svg) {
+                        var result = domParser.parseFromString(svg, "image/svg+xml");
+                        if (lastSvg) {
+                            graph.removeChild(lastSvg);
+                        }
+                        lastSvg = result.documentElement;
+                        graph.appendChild(lastSvg);
+                    }
+                }, 1000);
+            });
+        </script>
+    </body>
+</html>
