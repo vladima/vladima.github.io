@@ -13,12 +13,15 @@
             flex-grow: 1;
         }
         svg {
-            width: 95%;
-            height: 95%
+            width: 70%;
+            height: 100%
         }
         #error {
             border: red;
             border-style: solid;
+        }
+        #output {
+            width: 70%;
         }
         </style>
         <script src="./scripts/viz.js"></script>
@@ -28,7 +31,14 @@
         <div id="app">
             <div id="panels">
                 <div id="editor">// paste the graph</div>
-                <div id="graph">   </div>
+                <div id="output">
+                    <div id="options">
+                        <label id="showTreeLabel">
+                            <input id="showTree" type="checkbox" checked>Show AST nodes</input>
+                        </label>
+                    </div>
+                    <div id="graph">   </div>
+                </div>
             </div>
         </div>
         <script src="./scripts/ace.js"></script>
@@ -75,11 +85,24 @@
                         graph.appendChild(graphContent);
                         if (graphContent instanceof SVGElement) {
                             svgPanZoom(graphContent);
+                            document.getElementById("showTree").checked = true;
                         }
                     }
 
                 }, 1000);
             });
+
+            document.getElementById("showTree").addEventListener("change", function(e) {
+                var value = this.checked ? "visible" : "hidden";
+                setVisibilityBySelector('[id^=tree_edge_]', value);
+                setVisibilityBySelector('[id^=tree_node_]', value);
+            });
+
+            function setVisibilityBySelector(selector, value) {
+                document.querySelectorAll(selector).forEach(function(el) {
+                    el.setAttribute("visibility", value);
+                });
+            }
         </script>
     </body>
 </html>
