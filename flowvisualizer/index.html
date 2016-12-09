@@ -54,6 +54,9 @@
             var errorText = document.createTextNode("");
             error.appendChild(errorText);
 
+            setShowTreeCheckboxState(/*enabled*/ false);
+
+
             var graphContent;
             var throttled;
 
@@ -85,7 +88,10 @@
                         graph.appendChild(graphContent);
                         if (graphContent instanceof SVGElement) {
                             svgPanZoom(graphContent);
-                            document.getElementById("showTree").checked = true;
+                            setShowTreeCheckboxState(/*enabled*/ true);
+                        }
+                        else {
+                            setShowTreeCheckboxState(/*enabled*/ false);
                         }
                     }
 
@@ -97,6 +103,17 @@
                 setVisibilityBySelector('[id^=tree_edge_]', value);
                 setVisibilityBySelector('[id^=tree_node_]', value);
             });
+
+            function setShowTreeCheckboxState(enabled) {
+                var checkbox = document.getElementById("showTree");
+                checkbox.checked = enabled;
+                if (enabled) {
+                    checkbox.removeAttribute("disabled");
+                }
+                else {
+                    checkbox.setAttribute("disabled", "");
+                }
+            }
 
             function setVisibilityBySelector(selector, value) {
                 document.querySelectorAll(selector).forEach(function(el) {
